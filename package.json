@@ -1,0 +1,26 @@
+{
+  "name": "vue-config-wrapper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "keywords": [
+    "vue",
+    "wrapper"
+  ],
+  "homepage": "https://github.com/kscript",
+  "repository": {
+    "url": "https://github.com/kscript/vue-config-wrapper"
+  },
+  "bugs": {
+    "url": "https://github.com/kscript/vue-config-wrapper/issues"
+  },
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "test": "node tests"
+  },
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "path": "^0.12.7"
+  }
+}
