@@ -28,7 +28,7 @@ const getModuleInfo = function(name) {
  * @param {string} path 访问路径,使用.分割
  * @returns {object} 未获取到或不符合要求时, 返回空对象
  */
-const getInnerObject = function(obj, path) {
+const getInnerObject = function(obj, path, cb) {
     if (typeof path === 'string') {
         let res = obj
         let keys = path.split('.')
@@ -37,12 +37,12 @@ const getInnerObject = function(obj, path) {
             if (res[key] instanceof Object) {
                 res = res[key]
             } else {
-                return {}
+                typeof cb === 'function' && cb(res, key)
             }
         }
+        typeof cb === 'function' && cb(res)
         return res
     }
-    return {}
 }
 /**
  * 
@@ -74,9 +74,9 @@ const compareVersion = function(a, b, len = 3) {
             aryA.forEach(function(item, index){
                 // 不等于1说明已经有比较结果了
                 if (num === 1) {
-                    if (item > aryB[index]) {
+                    if (item - aryB[index] > 0) {
                         num = 0
-                    } else if (item < aryB[index]){
+                    } else if (item - aryB[index] < 0){
                         num = 2
                     }
                 }
@@ -97,7 +97,7 @@ const compareVersion = function(a, b, len = 3) {
  */
 const updateConfig = function(config, version, changelog, cb) {
     cb = typeof cb === 'function' ? cb : function(){}
-    let reverseIndex = -1
+    let reverseIndex = 0
     const list = changelog.slice(0).sort(function(a, b) {
         let va = Array.isArray(a.version) ? a.version[0] : a.version
         let vb = Array.isArray(b.version) ? b.version[0] : b.version
@@ -116,24 +116,24 @@ const updateConfig = function(config, version, changelog, cb) {
         if (!valid) {
             return true
         }
-        reverseIndex = index
+        reverseIndex = index + 1
     })
     if (valid) {
         reverseIndex = changelog.length
     }
-    const newList = reverseIndex < 0 ? list.reverse() : list.slice(0, reverseIndex + 1).concat(list.slice(reverseIndex + 1).reverse())
+    const newList = reverseIndex === 0 ? list.reverse() : list.slice(0, reverseIndex + 1).concat(list.slice(reverseIndex + 1).reverse())
     newList.some(function(item, index) {
         if (item instanceof Object) {
-            if (typeof item.update !== 'function' || item.update(config, item, index < reverseIndex) === true) {
+            if (typeof item.update !== 'function' || item.update(config, item, index, reverseIndex) === true) {
                 if (item.replace instanceof Object) {
                     for(let k in item.replace) {
-                        if (reverseIndex < 0) {
+                        if (reverseIndex === 0) {
                             if (config[item.replace[k]]) {
                                 cb(0, config, item, k)
                                 config[k] = config[k] || config[item.replace[k]]
                                 delete config[item.replace[k]]
                             }
-                        } else if (index <= reverseIndex) {
+                        } else if (index < reverseIndex) {
                             cb(1, config, item, k)
                             if (!config[item.replace[k]]) {
                                 config[item.replace[k]] = config[k]

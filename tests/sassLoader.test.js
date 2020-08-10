@@ -1,6 +1,26 @@
 const main = require('../src/')
 const utils = require('../src/utils')
 const sassLoader = require('../src/lib/sassLoader')
+const changelog = [
+    {
+        version: '8.0.0',
+        replace: {
+            data: 'prependData'
+        }
+    },
+    {
+        version: '9.0.0',
+        replace: {
+            prependData: 'additionalData'
+        }
+    },
+    {
+        version: '10.0.0',
+        replace: {
+            additionalData: 'additionalData2'
+        }
+    }
+]
 const sassConfig = function(config = {}) {
     return {
         css: {
@@ -17,14 +37,14 @@ const sassVersion = function(version, config = {}, loaderConfig = {}, lib = []) 
         loaderConfig =  Object.assign({}, sassLoader, {
             handler: function (config, info, utils) {
                 info.version = info.version || version
-                utils.updateConfig(config, info.version, sassLoader.changelog, function(type, config, item, k) {
-                    console.log(
-                        '安装版本号: ' + info.version, 
-                        '变更记录:' + item.version + ' [' + k + '调整为' + item.replace[k] + ']', 
-                        '当前配置: ', config,
-                        item,
-                        type
-                    )
+                utils.updateConfig(config, info.version, changelog, function(type, config, item, k) {
+                    // console.log([
+                    //     '安装版本号: ' + info.version, 
+                    //     '变更记录:' + item.version + ' [' + k + '调整为' + item.replace[k] + ']', 
+                    //     '当前配置: ', config,
+                    //     item,
+                    //     type
+                    // ])
                 })
             }
         }, loaderConfig)
@@ -37,11 +57,11 @@ const sassVersion = function(version, config = {}, loaderConfig = {}, lib = []) 
     }
 }
 const test = function(title, expect, exec){
-    return function () {
+    return function (index) {
         const result = exec()
         console.log('-------- ' + title + ' --------')
         console.log([expect, result])
-        console.log()
+        console.log('index', index, 'return', expect === result)
         return expect === result
     }
 }
@@ -195,8 +215,8 @@ module.exports = function() {
                 additionalData: '9.0.1'
             })
         )
-    ].map(function(item){
-        return item()
+    ].map(function(item, index){
+        return item(index)
     }).filter(function(item) {
         return item !== void 0
     })

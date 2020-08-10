@@ -9,11 +9,28 @@ module.exports = function(config, options) {
         try {
             myLib.map(function(item) {
                 if (item instanceof Object && typeof item.handler === 'function') {
-                    const itemConfig = utils.getInnerObject(config, item.path)
-                    if (itemConfig) {
-                        const itemInfo = utils.getModuleInfo(item.type === 'module' ? item.name : '@vue/cli-service')
-                        itemInfo.version && item.handler(itemConfig, itemInfo, utils)
-                    }
+                    utils.getInnerObject(config, item.path, function(itemConfig, key) {
+                        const itemInfo = {}
+                        const moreInfo = {}
+                        const cliInfo = utils.getModuleInfo('@vue/cli-service')
+                        if (item.type === 'module') {
+                            const moduleInfo = utils.getModuleInfo(item.name)
+                            Object.assign(itemInfo, moduleInfo)
+                            Object.assign(moreInfo, cliInfo)
+                        } else {
+                            Object.assign(itemInfo, cliInfo)
+                        }
+                        if (arguments.length > 1) {
+                            const proxyConfig = {
+                                [key]: itemConfig[key],
+                                0: itemConfig[key]
+                            }
+                            item.handler(proxyConfig, itemInfo, utils, moreInfo)
+                            itemConfig[key] = proxyConfig[key]
+                        } else {
+                            item.handler(itemConfig, itemInfo, utils, moreInfo)
+                        }
+                    })
                 }
             })
         } catch (e) {
