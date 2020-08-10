@@ -1,17 +1,11 @@
-const name = 'sass-loader'
-const type = 'module'
-const path = 'css.loaderOptions.sass'
+const name = 'css'
+const type = 'option'
+const path = 'css'
 const changelog = [
     {
-        version: '8.0.0',
+        version: '4.0.0',
         replace: {
-            data: 'prependData'
-        }
-    },
-    {
-        version: '9.0.0',
-        replace: {
-            prependData: 'additionalData'
+            modules: 'requireModuleExtension'
         }
     }
 ]

@@ -4,16 +4,16 @@ const { i18n } = require('./utils')
 module.exports = function(config, options) {
     options = options instanceof Object ? options : {}
     const myLib = options.lib || lib
-    if (options.noconsole) {
-        global.noconsole = options.noconsole
-    }
+    global.noconsole = options.hasOwnProperty('noconsole') ? !!options.noconsole : true
     if (config instanceof Object) {
         try {
             myLib.map(function(item) {
                 if (item instanceof Object && typeof item.handler === 'function') {
-                    const itemInfo = utils.getModuleInfo(item.name)
                     const itemConfig = utils.getInnerObject(config, item.path)
-                    item.handler(itemConfig, itemInfo, utils);
+                    if (itemConfig) {
+                        const itemInfo = utils.getModuleInfo(item.type === 'module' ? item.name : '@vue/cli-service')
+                        itemInfo.version && item.handler(itemConfig, itemInfo, utils)
+                    }
                 }
             })
         } catch (e) {

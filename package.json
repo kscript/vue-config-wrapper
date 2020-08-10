@@ -1,6 +1,6 @@
 {
   "name": "vue-config-wrapper",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "src/index.js",
   "keywords": [
@@ -14,12 +14,16 @@
   "bugs": {
     "url": "https://github.com/kscript/vue-config-wrapper/issues"
   },
+  "bin": {
+    "vcw": ".bin/vcw.js"
+  },
   "author": "",
   "license": "MIT",
   "scripts": {
     "test": "node tests"
   },
   "dependencies": {
+    "commander": "^6.0.0",
     "fs": "0.0.1-security",
     "path": "^0.12.7"
   }
